@@ -102,13 +102,13 @@ export function DataTabelbyDate() {
       rows.push(
         <tr key={`data-${index}`}>
           <td>{index + 1}</td>
-          <td>{data.suhu !== null ? data.suhu.toFixed(0) + " C" : "N/A"}</td>
+          <td>{data.suhu !== null ? data.suhu + " C" : "N/A"}</td>
           <td>
             {data.kelembaban !== null
-              ? data.kelembaban.toFixed(0) + " %"
+              ? data.kelembaban + " %"
               : "N/A"}
           </td>
-          <td>{data.NH3 !== null ? data.NH3.toFixed(0) : "N/A"}</td>
+          <td>{data.NH3 !== null ? data.NH3 : "N/A"}</td>
           <td>
             {data.createdAt !== null
               ? new Date(data.createdAt).toLocaleString()

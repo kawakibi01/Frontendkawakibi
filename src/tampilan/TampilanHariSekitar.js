@@ -103,7 +103,7 @@ export function DataTabelbyDate() {
         <tr key={`data-${index}`}>
           <td>{index + 1}</td>
         
-          <td>{data.NH3 !== null ? data.NH3.toFixed(0) : "N/A"}</td>
+          <td>{data.NH3 !== null ? data.NH3 : "N/A"}</td>
           <td>
             {data.createdAt !== null
               ? new Date(data.createdAt).toLocaleString()
