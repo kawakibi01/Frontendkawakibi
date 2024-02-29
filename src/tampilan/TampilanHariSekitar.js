@@ -35,7 +35,7 @@ export function DataTabelbyDate() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `https://grafikserver.vercel.app/ambilDataDenganTanggal?date=${selectedDate.toISOString()}`
+          `https://grafikserver.vercel.app/ambilDataDenganTanggalSekitarKandangSapi?date=${selectedDate.toISOString()}`
         );
         // Filter data berdasarkan tanggal yang dipilih
         const filteredData = response.data.filter(
