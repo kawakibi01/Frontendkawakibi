@@ -77,9 +77,45 @@ export function GrafikSuhu() {
                   height={500}
                   data={sensorData.map((data) => ({
                     ...data,
-                    suhu: data.suhu !== null ? data.suhu : 0,
-                    kelembaban: data.kelembaban !== null ? data.kelembaban : 0,
                     NH3: data.NH3 !== null ? data.NH3 : 0,
+                  }))}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="createdAt"
+                    type="category"
+                    tickFormatter={formatDate}
+                  />
+                  <YAxis yAxisId="left" tickFormatter={formatNumber} />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tickFormatter={formatNumber}
+                  />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="NH3"
+                    stroke="#ffc658"
+                    name="NH3"
+                    yAxisId="right"
+                  />
+                </LineChart>
+              </Card>
+            </Container>
+          </div>
+          <div className="product-catagory-wrap">
+            <Container>
+              <Card className="mb-3 catagory-card">
+                <LineChart
+                  width={1000}
+                  height={500}
+                  data={sensorData.map((data) => ({
+                    ...data,
+                    suhu: data.suhu !== null ? data.suhu : 0,
+                  
                   }))}
                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
@@ -104,6 +140,37 @@ export function GrafikSuhu() {
                     name="Suhu (°C)"
                     yAxisId="left"
                   />
+                
+                </LineChart>
+              </Card>
+            </Container>
+          </div>
+          <div className="product-catagory-wrap">
+            <Container>
+              <Card className="mb-3 catagory-card">
+                <LineChart
+                  width={1000}
+                  height={500}
+                  data={sensorData.map((data) => ({
+                    ...data,
+                    kelembaban: data.kelembaban !== null ? data.kelembaban : 0,
+                  }))}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="createdAt"
+                    type="category"
+                    tickFormatter={formatDate}
+                  />
+                  <YAxis yAxisId="left" tickFormatter={formatNumber} />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tickFormatter={formatNumber}
+                  />
+                  <Tooltip />
+                  <Legend />
                   <Line
                     type="monotone"
                     dataKey="kelembaban"
@@ -111,19 +178,13 @@ export function GrafikSuhu() {
                     name="Kelembaban (%)"
                     yAxisId="left"
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="NH3"
-                    stroke="#ffc658"
-                    name="NH3"
-                    yAxisId="right"
-                  />
                 </LineChart>
               </Card>
             </Container>
           </div>
         </Container>
       </div>
+
     </Row>
   );
 }
