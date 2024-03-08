@@ -100,7 +100,7 @@ export function GrafikSuhu() {
                     dataKey="NH3"
                     stroke="#ffc658"
                     name="NH3"
-                    yAxisId="right"
+                    yAxisId="left"
                   />
                 </LineChart>
               </Card>
