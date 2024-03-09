@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Row, Card } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Card, Container, Row } from "react-bootstrap";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
-  PieChart,
-  Pie,
-  Cell,
+  Line,
+  LineChart,
+  Tooltip,
+  XAxis,
+  YAxis
 } from "recharts";
 
 function TampilanGrafik() {
@@ -37,7 +34,11 @@ export function GrafikSuhu() {
         const response = await axios.get(
           "https://grafikserver.vercel.app/ambilDataKandangSapi"
         );
-        setSensorData(response.data);
+        const modifiedData = response.data.map((data) => ({
+          ...data,
+          createdAt: formatDate(data.createdAt), // Mengubah format tanggal di sini
+        }));
+        setSensorData(modifiedData);
       } catch (error) {
         console.error("Error fetching sensor data:", error);
       }
@@ -50,28 +51,51 @@ export function GrafikSuhu() {
     return () => clearInterval(interval);
   }, []);
 
+  
   const formatNumber = (number) => {
     return number.toFixed(0);
   };
 
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    const isoDate = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
-    ).toISOString();
-    return isoDate.slice(0, 19).replace("T", " ");
-  };
+ const formatDate = (dateStr) => {
+   const date = new Date(dateStr);
+   const months = [
+     "Jan",
+     "Feb",
+     "Mar",
+     "Apr",
+     "May",
+     "Jun",
+     "Jul",
+     "Aug",
+     "Sep",
+     "Oct",
+     "Nov",
+     "Dec",
+   ];
+   const isoDate = new Date(
+     date.getTime() - date.getTimezoneOffset() * 60000
+   ).toISOString();
+   const day = isoDate.slice(8, 10);
+   const month = months[parseInt(isoDate.slice(5, 7), 10) - 1];
+  //  const year = isoDate.slice(0, 4);
+   return `${day} ${month} ${isoDate.slice(11, 19)}`;
+ };
 
   return (
     <Row className="justify-content-md-center">
       <div className="product-catagories-wrapper pt-3">
         <Container>
-          <div className="section-heading">
+          {/* <div className="section-heading">
             <h6 className="ml-3">Grafik Sensor</h6>
-          </div>
+          </div> */}
           <div className="product-catagory-wrap">
             <Container>
-              <Card className="mb-3 catagory-card">
+              <Card className="mb-3 catagory-card" style={{ borderWidth: "2px" }}>
+
+                <h3 className="text-center" style={{ marginTop: "10px" }}>
+                  Grafik NH3
+                </h3>
+
                 <LineChart
                   width={1000}
                   height={500}
@@ -108,14 +132,17 @@ export function GrafikSuhu() {
           </div>
           <div className="product-catagory-wrap">
             <Container>
-              <Card className="mb-3 catagory-card">
+              <Card className="mb-3 catagory-card" style={{ borderWidth: "2px" }}>
+
+                <h3 className="text-center" style={{ marginTop: "10px" }}>
+                  Grafik Suhu
+                </h3>
                 <LineChart
                   width={1000}
                   height={500}
                   data={sensorData.map((data) => ({
                     ...data,
                     suhu: data.suhu !== null ? data.suhu : 0,
-                  
                   }))}
                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
@@ -140,14 +167,17 @@ export function GrafikSuhu() {
                     name="Suhu (°C)"
                     yAxisId="left"
                   />
-                
                 </LineChart>
               </Card>
             </Container>
           </div>
           <div className="product-catagory-wrap">
             <Container>
-              <Card className="mb-3 catagory-card">
+              <Card className="mb-3 catagory-card" style={{ borderWidth: "2px" }}>
+
+                <h3 className="text-center" style={{ marginTop: "10px" }}>
+                  Grafik Kelembaban
+                </h3>
                 <LineChart
                   width={1000}
                   height={500}
@@ -184,7 +214,6 @@ export function GrafikSuhu() {
           </div>
         </Container>
       </div>
-
     </Row>
   );
 }

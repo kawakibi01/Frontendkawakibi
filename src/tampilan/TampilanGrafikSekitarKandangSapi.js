@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Row, Card } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Card, Container, Row } from "react-bootstrap";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
-  PieChart,
-  Pie,
-  Cell,
+  Line,
+  LineChart,
+  Tooltip,
+  XAxis,
+  YAxis
 } from "recharts";
 
 function TampilanGrafikSekitarKandangSapi() {
@@ -37,7 +34,11 @@ export function GrafikSuhu() {
         const response = await axios.get(
           "https://grafikserver.vercel.app/ambilDataSekitarKandangSapi"
         );
-        setSensorData(response.data);
+        const modifiedData = response.data.map((data) => ({
+          ...data,
+          createdAt: formatDate(data.createdAt), // Mengubah format tanggal di sini
+        }));
+        setSensorData(modifiedData);
       } catch (error) {
         console.error("Error fetching sensor data:", error);
       }
@@ -56,22 +57,39 @@ export function GrafikSuhu() {
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const isoDate = new Date(
       date.getTime() - date.getTimezoneOffset() * 60000
     ).toISOString();
-    return isoDate.slice(0, 19).replace("T", " ");
+    const day = isoDate.slice(8, 10);
+    const month = months[parseInt(isoDate.slice(5, 7), 10) - 1];
+    //  const year = isoDate.slice(0, 4);
+    return `${day} ${month} ${isoDate.slice(11, 19)}`;
   };
 
   return (
     <Row className="justify-content-md-center">
       <div className="product-catagories-wrapper pt-3">
         <Container>
-          <div className="section-heading">
-            <h6 className="ml-3">Grafik Sensor</h6>
-          </div>
+          <div className="section-heading"></div>
           <div className="product-catagory-wrap">
             <Container>
+
               <Card className="mb-3 catagory-card">
+              <h3 className="ml-3 mt-2 text-center">Grafik Sensor NH3</h3>
                 <LineChart
                   width={1000}
                   height={500}
@@ -100,7 +118,7 @@ export function GrafikSuhu() {
                     dataKey="NH3"
                     stroke="#ffc658"
                     name="NH3"
-                    yAxisId="right"
+                    yAxisId="left"
                   />
                 </LineChart>
               </Card>
