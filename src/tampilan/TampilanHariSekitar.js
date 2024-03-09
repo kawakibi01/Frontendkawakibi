@@ -1,55 +1,61 @@
-import { Card, Container, Row } from "react-bootstrap";
-import React, { useState, useEffect } from "react";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Card, Container, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
-  LineChart,
+  CartesianGrid,
+  Legend,
   Line,
+  LineChart,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
 } from "recharts";
 
-function TampilanHariSekitar() {
+function TampilanHari() {
   return (
     <Container>
       <h1 className="judul text-center">Filter Hari Sekitar Kandang Sapi</h1>
 
       <div className="tampilanhome mb-5">
         <DataTabelbyDate />
-      </div> 
+      </div>
     </Container>
   );
 }
 
-export default TampilanHariSekitar;
+export default TampilanHari;
 
 export function DataTabelbyDate() {
   const [sensorData, setSensorData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (selectedDate) => {
       try {
         const response = await axios.get(
-          `https://grafikserver.vercel.app/ambilDataDenganTanggalSekitarKandangSapi?date=${selectedDate.toISOString()}`
+          `https://grafikserver.vercel.app/ambilDataDenganTanggalSekitarKandangSapi?date=${formatDate(
+            selectedDate
+          )}`
         );
-        // Filter data berdasarkan tanggal yang dipilih
-        const filteredData = response.data.filter(
-          (data) =>
-            new Date(data.createdAt).toLocaleDateString() ===
-            selectedDate.toLocaleDateString()
-        );
+        const filteredData = response.data
+          .filter(
+            (data) =>
+              new Date(data.createdAt).toLocaleDateString() ===
+              selectedDate.toLocaleDateString()
+          )
+          .map((data) => ({
+            ...data,
+            createdAt: formatDate(data.createdAt),
+          }));
         setSensorData(filteredData);
       } catch (error) {
         console.error("Error fetching sensor data:", error);
       }
     };
 
-    fetchData();
+    fetchData(selectedDate);
   }, [selectedDate]);
 
   const handleDateChange = (date) => {
@@ -86,11 +92,12 @@ export function DataTabelbyDate() {
 
     sensorData.forEach((data, index) => {
       const currentDataDate = new Date(data.createdAt).toLocaleDateString();
+
       const dayName = formatDayName(data.createdAt);
 
       if (currentDataDate !== currentDate) {
         rows.push(
-          <tr key= {`date-${index}`} className="date-indicator">
+          <tr key={`date-${index}`} className="date-indicator">
             <td colSpan="5">
               <strong>{dayName}</strong> - {currentDataDate}
             </td>
@@ -102,12 +109,9 @@ export function DataTabelbyDate() {
       rows.push(
         <tr key={`data-${index}`}>
           <td>{index + 1}</td>
-        
           <td>{data.NH3 !== null ? data.NH3 : "N/A"}</td>
           <td>
-            {data.createdAt !== null
-              ? new Date(data.createdAt).toLocaleString()
-              : "N/A"}
+            {data.createdAt !== null ? formatDate(data.createdAt) : "N/A"}
           </td>
         </tr>
       );
@@ -122,10 +126,27 @@ export function DataTabelbyDate() {
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const isoDate = new Date(
       date.getTime() - date.getTimezoneOffset() * 60000
     ).toISOString();
-    return isoDate.slice(0, 19).replace("T", " ");
+    const day = isoDate.slice(8, 10);
+    const month = months[parseInt(isoDate.slice(5, 7), 10) - 1];
+    const year = isoDate.slice(0, 4);
+    return `${day} ${month} ${year} ${isoDate.slice(11, 19)}`;
   };
 
   return (
@@ -149,44 +170,49 @@ export function DataTabelbyDate() {
                   <thead>
                     <tr>
                       <th scope="col">No</th>
-                    
                       <th scope="col">NH3</th>
                       <th scope="col">Tanggal</th>
                     </tr>
                   </thead>
                   <tbody>{renderDataRows()}</tbody>
                 </table>
-                <div className="d-flex justify-content-center">
-                  <LineChart
-                    width={500}
-                    height={300}
-                    data={sensorData}
-                    margin={{ top: 5, right: 50, left: 50, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="createdAt"
-                      type="category"
-                      tickFormatter={formatDate}
-                    />
-                    <YAxis yAxisId="left" tickFormatter={formatNumber} />
-                    <YAxis
-                      yAxisId="right"
-                      orientation="right"
-                      tickFormatter={formatNumber}
-                    />
-                    <Tooltip />
-                    <Legend />
-                    
-                    <Line
-                      type="monotone"
-                      dataKey="NH3"
-                      stroke="#ffc658"
-                      name="NH3"
-                      yAxisId="right"
-                    />
-                  </LineChart>
-                </div>
+                <Container>
+                 
+                  <div className="d-flex justify-content-center">
+                    <LineChart
+                      width={500}
+                      height={300}
+                      data={sensorData}
+                      margin={{ top: 5, right: 50, left: 50, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="createdAt"
+                        type="category"
+                        tickFormatter={(value) => {
+                          const date = new Date(value);
+                          return `${date.getHours()}:${date.getMinutes()}`;
+                        }}
+                      />
+                      <YAxis yAxisId="left" tickFormatter={formatNumber} />
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        tickFormatter={formatNumber}
+                      />
+                      <Tooltip />
+                      <Legend />
+
+                      <Line
+                        type="monotone"
+                        dataKey="NH3"
+                        stroke="#ffc658"
+                        name="NH3"
+                        yAxisId="left"
+                      />
+                    </LineChart>
+                  </div>
+                </Container>
               </Card>
             </Container>
           </div>
