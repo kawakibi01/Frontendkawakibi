@@ -53,9 +53,9 @@ export function GrafikSuhu() {
 
   
   const formatNumber = (number) => {
-    return number.toFixed(0);
+    return new Intl.NumberFormat().format(number);
   };
-
+  
  const formatDate = (dateStr) => {
    const date = new Date(dateStr);
    const months = [
