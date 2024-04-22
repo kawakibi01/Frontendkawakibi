@@ -124,6 +124,7 @@ export function DataTabelbyDate() {
     return new Intl.NumberFormat().format(number);
   };
 
+
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     const months = [
